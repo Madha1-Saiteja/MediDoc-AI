@@ -7,6 +7,7 @@ function Form_mp3() {
   const [error, setError] = useState("");
   const [pdfUrl, setPdfUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [responseData, setResponseData] = useState(null); // Added to store response for debugging
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
@@ -38,18 +39,19 @@ function Form_mp3() {
     setError("");
 
     try {
-      const response = await axios.post("http://127.0.0.1:5000/api/audio/upload", formData, {
+      const response = await axios.post("http://127.0.0.1:5001/api/audio/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      console.log("response:---", response);
-      if (response.status === 200) {
-        setPdfUrl(`http://127.0.0.1:5000/${response.data.pdfPath}`); // Update PDF URL
+      console.log("Response:", response.data);
+      setResponseData(response.data); // Store response for debugging
+      if (response.status === 200 && response.data.pdfPath) {
+        setPdfUrl(`http://127.0.0.1:5001/${response.data.pdfPath}`);
       } else {
         setError("File uploaded but no transcript found.");
       }
     } catch (error) {
       console.error("File upload failed:", error);
-      setError("File upload failed.");
+      setError(error.response?.data?.message || `File upload failed: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -100,6 +102,13 @@ function Form_mp3() {
         >
           View Transcript
         </button>
+      )}
+
+      {responseData && (
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold">Response Data:</h3>
+          <pre className="bg-gray-100 p-2 rounded">{JSON.stringify(responseData, null, 2)}</pre>
+        </div>
       )}
     </div>
   );
