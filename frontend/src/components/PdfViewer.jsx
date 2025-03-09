@@ -1,32 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 function PdfViewer() {
-  const pdfUrl = "http://127.0.0.1:8000/media/transcription.pdf";
+  const location = useLocation();
+  const { pdfUrl } = location.state || {};
+  const [pdfError, setPdfError] = useState(null);
+
+  useEffect(() => {
+    if (pdfUrl) {
+      // Test if the PDF URL is accessible
+      fetch(pdfUrl)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to load PDF');
+          }
+        })
+        .catch((error) => {
+          setPdfError(error.message);
+        });
+    }
+  }, [pdfUrl]);
+
+  if (!pdfUrl) {
+    return <div className="text-center mt-10 text-red-500">No PDF URL provided. Please upload a file first.</div>;
+  }
+
+  if (pdfError) {
+    return <div className="text-center mt-10 text-red-500">Error: {pdfError}</div>;
+  }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 mt-20">
-      <div className="max-w-4xl w-full bg-white p-6 shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold mb-4 text-center">Transcription PDF</h2>
-        {pdfUrl ? (
-          <object
-            data={pdfUrl}
-            type="application/pdf"
-            width="100%"
-            height="600px"
-          >
-            <p>
-              Your browser does not support PDFs. 
-              <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
-                Click here to download the PDF.
-              </a>
-            </p>
-          </object>
-        ) : (
-          <p className="text-red-500 text-center">No PDF available.</p>
-        )}
+    <div className="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Transcript PDF</h2>
+      <iframe
+        src={pdfUrl}
+        width="100%"
+        height="600px"
+        title="PDF Transcript"
+        className="border border-gray-300 rounded"
+        onError={() => setPdfError("Failed to display PDF. It may not exist or is inaccessible.")}
+      />
+      <div className="mt-4 text-center">
+        <a
+          href={pdfUrl}
+          download
+          className="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded transition duration-200"
+        >
+          Download PDF
+        </a>
       </div>
     </div>
   );
 }
 
-export default PdfViewer; 
+export default PdfViewer;

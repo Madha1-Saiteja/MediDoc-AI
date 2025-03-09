@@ -7,7 +7,6 @@ function Form_mp3() {
   const [error, setError] = useState("");
   const [pdfUrl, setPdfUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const [responseData, setResponseData] = useState(null); // Added to store response for debugging
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
@@ -43,9 +42,11 @@ function Form_mp3() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       console.log("Response:", response.data);
-      setResponseData(response.data); // Store response for debugging
       if (response.status === 200 && response.data.pdfPath) {
-        setPdfUrl(`http://127.0.0.1:5001/${response.data.pdfPath}`);
+        const generatedPdfUrl = `http://127.0.0.1:5001/${response.data.pdfPath}`;
+        setPdfUrl(generatedPdfUrl);
+        // Navigate immediately to pdf-viewer after successful upload
+        navigate("/pdf-viewer", { state: { pdfUrl: generatedPdfUrl } });
       } else {
         setError("File uploaded but no transcript found.");
       }
@@ -54,14 +55,6 @@ function Form_mp3() {
       setError(error.response?.data?.message || `File upload failed: ${error.message}`);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleViewPdf = () => {
-    if (pdfUrl) {
-      navigate("/pdf-viewer", { state: { pdfUrl } });
-    } else {
-      setError("Transcript not available yet.");
     }
   };
 
@@ -94,22 +87,6 @@ function Form_mp3() {
           {loading ? "Uploading..." : "Upload"}
         </button>
       </form>
-
-      {pdfUrl && (
-        <button
-          onClick={handleViewPdf}
-          className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded transition duration-200"
-        >
-          View Transcript
-        </button>
-      )}
-
-      {responseData && (
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold">Response Data:</h3>
-          <pre className="bg-gray-100 p-2 rounded">{JSON.stringify(responseData, null, 2)}</pre>
-        </div>
-      )}
     </div>
   );
 }

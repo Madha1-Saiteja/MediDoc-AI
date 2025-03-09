@@ -1,44 +1,44 @@
-import React from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import RootLayout from './RootLayout'
-import './App.css'
-import Home from './components/Home'
-import Login from './components/Login'
-import Register from './components/Register'
-import Form_mp3 from './components/Form_mp3'
-import PdfViewer from './components/PdfViewer'
+import React from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import RootLayout from './RootLayout';
+import './App.css';
+import Home from './components/Home';
+import Login from './components/Login';
+import Register from './components/Register';
+import Form_mp3 from './components/Form_mp3';
+import PdfViewer from './components/PdfViewer';
+
 function App() {
-  const browser=createBrowserRouter([
+  const browser = createBrowserRouter([
     {
       path: '/',
-      element: <RootLayout/>,
+      element: <RootLayout />,
       children: [
         {
           path: '/',
-          element: <Home />
+          element: <Home />,
         },
         {
           path: '/login',
-          element: <Login />
+          element: <Login />,
         },
         {
           path: '/signup',
-          element: <Register />
+          element: <Register />,
         },
         {
           path: '/form',
-          element: <Form_mp3 />
+          element: <Form_mp3 />,
         },
         {
           path: '/pdf-viewer',
-          element: <PdfViewer />
-        }
-      ]
-    }
-  ])
-  return (
-    <RouterProvider router={browser} />
-  )
+          element: <PdfViewer />,
+        },
+      ],
+    },
+  ]);
+
+  return <RouterProvider router={browser} />;
 }
 
-export default App
+export default App;
